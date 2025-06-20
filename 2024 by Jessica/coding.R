@@ -1,4 +1,4 @@
-setwd("C:/Summer")
+setwd("C:/Summer/Maison-en-Terre/2024 by Jessica")
 
 #DATA IMPORT
 #library (readr)
@@ -15,17 +15,70 @@ temp2024 <- temp2024 %>%
 #SMOOTHING
 install.packages("zoo")
 library(zoo)
+
+#SMOOTHING FOR 10 POINTS
 temp2024 <- temp2024 %>%
-  mutate(SM_tempsud = rollmean(temp_sud, k = 10, fill = NA, align = "center"))
+  mutate(SM10_tempsud = rollmean(temp_sud, k = 10, fill = NA, align = "center"))
 temp2024 <- temp2024 %>%
-  mutate(SM_tempnord = rollmean(temp_nord, k = 10, fill = NA, align = "center"))
+  mutate(SM10_tempnord = rollmean(temp_nord, k = 10, fill = NA, align = "center"))
 temp2024 <- temp2024 %>%
-  mutate(SM_tempe4000 = rollmean(temp_e4000, k = 10, fill = NA, align = "center"))
+  mutate(SM10_tempe4000 = rollmean(temp_e4000, k = 10, fill = NA, align = "center"))
 temp2024 <- temp2024 %>%
-  mutate(SM_tempstation = rollmean(temp_station, k = 10, fill = NA, align = "center"))
+  mutate(SM10_tempstation = rollmean(temp_station, k = 10, fill = NA, align = "center"))
+
+#SMOOTHING FOR 50 POINTS
+temp2024 <- temp2024 %>%
+  mutate(SM50_tempsud = rollmean(temp_sud, k = 50, fill = NA, align = "center"))
+temp2024 <- temp2024 %>%
+  mutate(SM50_tempnord = rollmean(temp_nord, k = 50, fill = NA, align = "center"))
+temp2024 <- temp2024 %>%
+  mutate(SM50_tempe4000 = rollmean(temp_e4000, k = 50, fill = NA, align = "center"))
+temp2024 <- temp2024 %>%
+  mutate(SM50_tempstation = rollmean(temp_station, k = 50, fill = NA, align = "center"))
+
+#PLOTS
+# 1st plot - Temperature_Interieur_Sud
+p1 <- ggplot(temp2024, aes(x = Time)) +
+  geom_line(aes(y = temp_sud, color = "Original")) +
+  geom_line(aes(y = SM10_tempsud, color = "k=10")) +
+  geom_line(aes(y = SM50_tempsud, color = "k=50")) +
+  labs(title = "Temperature Interieur Sud", y = "Temp (°C)", color = "") +
+  theme_minimal()
+
+# 2nd plot - Temperature_Interieur_Nord
+p2 <- ggplot(temp2024, aes(x = Time)) +
+  geom_line(aes(y = temp_nord, color = "Original")) +
+  geom_line(aes(y = SM10_tempnord, color = "k=10")) +
+  geom_line(aes(y = SM50_tempnord, color = "k=50")) +
+  labs(title = "Temperature Interieur Nord", y = "Temp (°C)", color = "") +
+  theme_minimal()
+
+# 3rd plot - Temperature_E4000
+p3 <- ggplot(temp2024, aes(x = Time)) +
+  geom_line(aes(y = temp_e4000, color = "Original")) +
+  geom_line(aes(y = SM10_tempe4000, color = "k=10")) +
+  geom_line(aes(y = SM50_tempe4000, color = "k=50")) +
+  labs(title = "Temperature E4000", y = "Temp (°C)", color = "") +
+  theme_minimal()
+
+# 4th plot - Station_Meteo
+p4 <- ggplot(temp2024, aes(x = Time)) +
+  geom_line(aes(y = temp_station, color = "Original")) +
+  geom_line(aes(y = SM10_tempstation, color = "k=10")) +
+  geom_line(aes(y = SM50_tempstation, color = "k=50")) +
+  labs(title = "Station Meteo", y = "Temp (°C)", color = "") +
+  theme_minimal()
+
+# Combine all 4 plots into one view
+install.packages("patchwork")
+library(patchwork)
+
+(p1 / p2) / (p3 / p4)
+
 
 #SUMMARY
-resumen_sm <- temp2024 %>%
+resumen <- temp2024 %>%
+  select(Time, SM10_tempsud,SM10_tempnord,SM10_tempe4000,SM10_tempstation)
   mutate(Date = as_date(Time)) %>%
   group_by(Date) %>%
   summarise(
@@ -77,4 +130,3 @@ warm_nights <- night_station %>%
  
 
 #plotdata
-fjfkj
